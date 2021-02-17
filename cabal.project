@@ -2,5 +2,5 @@ packages: *
 
 source-repository-package
   type: git
-  location: https://github.com/ekmett/linear-base.git
-  tag: 7df8393317b1b192472d043148ade31f00471c55
+  location: https://github.com/tweag/linear-base.git
+  tag: 26bb6f42bc6f33a7a3b933aa1aaf2064a440f235

@@ -49,7 +49,7 @@ lseq = Unsafe.toLinear2 \_ b -> b
 -- | Allocate a mutable array of given size using a default value.
 --
 -- The size should be non-negative.
-alloc :: Int -> (ByteArray# %1 -> Ur b) %1 -> Ur b
+alloc :: Int -> (ByteArray# %1 -> b) %1 -> b
 alloc (GHC.I# s) f =
   let new = GHC.runRW# \st -> case GHC.newByteArray# s st of
         (# _, arr #) -> ByteArray# arr

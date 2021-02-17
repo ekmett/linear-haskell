@@ -23,7 +23,6 @@ module Data.Primitive.Linear.ByteArray
     set,
     unsafeSet,
     resize,
-    map,
     -- * Accessors
     get,
     unsafeGet,
@@ -59,7 +58,7 @@ data ByteArray = ByteArray ByteArray#
 
 -- | Allocate a constant array given a size and an initial value
 -- The size must be non-negative, otherwise this errors.
-alloc :: HasCallStack => Int -> (ByteArray %1-> Ur b) %1-> Ur b
+alloc :: HasCallStack => Int -> (ByteArray %1 -> Ur b) %1 -> Ur b
 alloc s f
   | s < 0 =
     (error ("ByteArray.alloc: negative size: " ++ show s) :: x %1-> x)
@@ -68,7 +67,7 @@ alloc s f
 
 -- | Allocate a constant array given a size and an initial value,
 -- using another array as a uniqueness proof.
-allocBeside :: Int -> ByteArray %1-> (ByteArray, ByteArray)
+allocBeside :: Int -> ByteArray %1 -> (ByteArray, ByteArray)
 allocBeside s (ByteArray orig)
   | s < 0 = Unlifted.lseq
     orig
