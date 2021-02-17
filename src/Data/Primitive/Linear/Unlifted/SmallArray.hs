@@ -9,7 +9,7 @@
 {-# Language KindSignatures #-}
 {-# Language PolyKinds #-}
 
-module Data.SmallArray.Mutable.Unlifted.Linear
+module Data.Primitive.Linear.Unlifted.SmallArray
   ( SmallArray#
   , unSmallArray#
   , alloc

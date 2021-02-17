@@ -38,8 +38,10 @@ library
   import: base
   hs-source-dirs: src
   exposed-modules:
-    Data.SmallArray.Mutable.Unlifted.Linear
     Data.Primitive.Linear.Array
     Data.Primitive.Linear.SmallArray
+    Data.Primitive.Linear.Unlifted.ByteArray
+    Data.Primitive.Linear.Unlifted.SmallArray
   reexported-modules:
-    Data.Primitive.Linear.SmallArray as Data.SmallArray.Mutable.Linear
+    Data.Primitive.Linear.SmallArray as Data.SmallArray.Mutable.Linear,
+    Data.Primitive.Linear.Unlifted.SmallArray as Data.SmallArray.Mutable.Unlifted.Linear

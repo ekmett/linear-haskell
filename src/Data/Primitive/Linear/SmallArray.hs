@@ -62,8 +62,8 @@ where
 
 import Data.Unrestricted.Linear
 import GHC.Stack
-import Data.SmallArray.Mutable.Unlifted.Linear (SmallArray#)
-import qualified Data.SmallArray.Mutable.Unlifted.Linear as Unlifted
+import Data.Primitive.Linear.Unlifted.SmallArray (SmallArray#)
+import qualified Data.Primitive.Linear.Unlifted.SmallArray as Unlifted
 import qualified Data.Functor.Linear as Data
 import Prelude.Linear ((&), forget)
 import qualified Data.Primitive.SmallArray as Prim
