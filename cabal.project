@@ -1,1 +1,6 @@
 packages: *
+
+source-repository-package
+  type: git
+  location: https://github.com/ekmett/linear-base.git
+  tag: 7df8393317b1b192472d043148ade31f00471c55

@@ -33,7 +33,7 @@
 -- True
 -- >>> unur $ SmallArray.fromList [1,2,3] isFirstZero
 -- False
-module Data.SmallArray.Mutable.Linear
+module Data.Primitive.Linear.SmallArray
   ( -- * Mutable Linear SmallArrays
     SmallArray,
     -- * Performing Computations with SmallArrays

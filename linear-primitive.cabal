@@ -27,7 +27,8 @@ common base
   build-depends:
     base >= 4.15 && < 5,
     linear-base,
-    primitive
+    primitive,
+    template-haskell
   ghc-options:
     -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates
     -Wredundant-constraints -Widentities
@@ -38,4 +39,7 @@ library
   hs-source-dirs: src
   exposed-modules:
     Data.SmallArray.Mutable.Unlifted.Linear
-    Data.SmallArray.Mutable.Linear
+    Data.Primitive.Linear.Array
+    Data.Primitive.Linear.SmallArray
+  reexported-modules:
+    Data.Primitive.Linear.SmallArray as Data.SmallArray.Mutable.Linear
