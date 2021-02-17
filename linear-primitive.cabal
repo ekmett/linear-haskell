@@ -39,6 +39,7 @@ library
   hs-source-dirs: src
   exposed-modules:
     Data.Primitive.Linear.Array
+    Data.Primitive.Linear.ByteArray
     Data.Primitive.Linear.SmallArray
     Data.Primitive.Linear.Unlifted.ByteArray
     Data.Primitive.Linear.Unlifted.SmallArray
