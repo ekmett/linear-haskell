@@ -37,4 +37,4 @@ library
   import: base
   hs-source-dirs: src
   exposed-modules:
-    Unlifted.Key
+    Data.Linear.Unlifted.Key

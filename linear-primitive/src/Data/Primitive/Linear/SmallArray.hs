@@ -79,7 +79,7 @@ data SmallArray a = SmallArray (SmallArray# a)
 
 -- | Allocate a constant array given a size and an initial value
 -- The size must be non-negative, otherwise this errors.
-alloc :: HasCallStack => Int -> a -> (SmallArray a %1-> Ur b) %1-> Ur b
+alloc :: HasCallStack => Int -> a -> (SmallArray a %1 -> Ur b) %1-> Ur b
 alloc s x f
   | s < 0 =
     (error ("SmallArray.alloc: negative size: " ++ show s) :: x %1-> x)
@@ -88,7 +88,7 @@ alloc s x f
 
 -- | Allocate a constant array given a size and an initial value,
 -- using another array as a uniqueness proof.
-allocBeside :: Int -> a -> SmallArray b %1-> (SmallArray a, SmallArray b)
+allocBeside :: Int -> a -> SmallArray b %1 -> (SmallArray a, SmallArray b)
 allocBeside s x (SmallArray orig)
   | s < 0 = Unlifted.lseq
     orig
@@ -122,17 +122,17 @@ size (SmallArray arr) = f (Unlifted.size arr) where
 
 -- | Sets the value of an index. The index should be less than the arrays
 -- size, otherwise this errors.
-set :: HasCallStack => Int -> a -> SmallArray a %1-> SmallArray a
+set :: HasCallStack => Int -> a -> SmallArray a %1 -> SmallArray a
 set i x arr = unsafeSet i x (assertIndexInRange i arr)
 
 -- | Same as 'set, but does not do bounds-checking. The behaviour is undefined
 -- if an out-of-bounds index is provided.
-unsafeSet :: Int -> a -> SmallArray a %1-> SmallArray a
+unsafeSet :: Int -> a -> SmallArray a %1 -> SmallArray a
 unsafeSet ix val (SmallArray arr) = SmallArray (Unlifted.set ix val arr)
 
 -- | Get the value of an index. The index should be less than the arrays 'size',
 -- otherwise this errors.
-get :: HasCallStack => Int -> SmallArray a %1-> (Ur a, SmallArray a)
+get :: HasCallStack => Int -> SmallArray a %1 -> (Ur a, SmallArray a)
 get i arr = unsafeGet i (assertIndexInRange i arr)
 
 -- | Same as 'get', but does not do bounds-checking. The behaviour is undefined
@@ -236,11 +236,11 @@ unsafeRead arr i = unsafeGet i arr
 -------------------------------------------------------------------------------
 
 instance Consumable (SmallArray a) where
-  consume :: SmallArray a %1-> ()
+  consume :: SmallArray a %1 -> ()
   consume (SmallArray arr) = arr `Unlifted.lseq` ()
 
 instance Dupable (SmallArray a) where
-  dup2 :: SmallArray a %1-> (SmallArray a, SmallArray a)
+  dup2 :: SmallArray a %1 -> (SmallArray a, SmallArray a)
   dup2 (SmallArray arr) = wrap (Unlifted.dup2 arr) where
     wrap :: (# SmallArray# a, SmallArray# a #) %1-> (SmallArray a, SmallArray a)
     wrap (# a1, a2 #) = (SmallArray a1, SmallArray a2)

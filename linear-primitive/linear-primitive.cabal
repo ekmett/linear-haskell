@@ -40,8 +40,10 @@ library
     Data.Primitive.Linear.Array
     Data.Primitive.Linear.ByteArray
     Data.Primitive.Linear.SmallArray
+    Data.Primitive.Linear.Token
     Data.Primitive.Linear.Unlifted.ByteArray
     Data.Primitive.Linear.Unlifted.SmallArray
+    Data.Primitive.Linear.Unlifted.Token
   reexported-modules:
     Data.Array.Mutable.Unlifted.Linear as Data.Primitive.Linear.Unlifted.Array, 
     Data.Primitive.Linear.SmallArray as Data.SmallArray.Mutable.Linear,
