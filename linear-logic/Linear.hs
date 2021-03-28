@@ -36,9 +36,12 @@ import Data.Functor.Contravariant
 import Data.Kind
 import Data.Void
 import GHC.Types
-import Data.Unrestricted.Linear
-import Unsafe.Linear as Unsafe
+-- import Data.Unrestricted.Linear
+-- import Unsafe.Linear as Unsafe
 import Prelude hiding (Functor)
+
+data Ur a where
+  Ur :: a -> Ur a
 
 class (Prop (Not a), Not (Not a) ~ a) => Prop a where
   type Not a = c | c -> a
@@ -68,7 +71,7 @@ instance Prop Bot where
 
 data Y a b c where
   L :: Y a b a
-  R :: Y a b b 
+  R :: Y a b b
 
 newtype a & b = With (forall c. Y a b c -> c)
 
@@ -79,7 +82,7 @@ infixr 3 &
 type With = (&)
 
 withL :: a & b %1 -> a
-withL (With f) = f L 
+withL (With f) = f L
 
 withR :: a & b %1 -> b
 withR (With f) = f R
@@ -109,10 +112,10 @@ par = Par
 runPar :: a ⅋ b %1 -> Y (Not b %1 -> a) (Not a %1 -> b) c %1 -> c
 runPar (Par p) y = p y
 
-unsafePar :: (Prop a, Prop b) => (forall c. Y (Not b -> a) (Not a -> b) c -> c) -> a ⅋ b
-unsafePar f = Par \case
-  L -> Unsafe.toLinear (f L)
-  R -> Unsafe.toLinear (f R)
+-- unsafePar :: (Prop a, Prop b) => (forall c. Y (Not b -> a) (Not a -> b) c -> c) -> a ⅋ b
+-- unsafePar f = Par \case
+--   L -> Unsafe.toLinear (f L)
+--   R -> Unsafe.toLinear (f R)
 
 {-
 unsafePar :: (Prop a, Prop b) => (forall c. Y (Not b %1 -> a) (Not a %1 -> b) c -> c) -> a ⅋ b
@@ -138,7 +141,7 @@ instance (Prop a, Prop b) => Prop (a ⅋ b) where
 -- p ⊸ q = Not p ⅋ q = With (Not b %1 -> Not a) (a %1 -> b)
 -- Not (p ⊸ q) = Not (Not p ⅋ q) = (p, Not q)
 -- Not (p, Not q) = Not p ⅋ q = p ⊸ q
-  
+
 instance (Prop a, Prop b) => Prop (a %'One -> b) where
   type Not (FUN 'One a b) = Nofun a b
   f != Nofun a nb = f a != nb
@@ -166,8 +169,20 @@ unfun (Par p) = p L
 -- heyting negation
 newtype No a = No { runNo :: forall r. a -> r }
 
-no :: No a -> a %1 -> r
-no (No f) = Unsafe.toLinear f 
+-- no :: No a -> a %1 -> r
+-- no (No f) = f
+
+runNo' :: No a %1 -> forall r. a -> r
+runNo' (No x) = x
+
+(%.) :: (a %m -> b) -> (b %m -> c) %n -> (a %m -> c)
+(%.) f g x = g (f x)
+
+class LContravariant f where
+  lcontramap :: (a -> b) -> f b %1 -> f a
+
+instance LContravariant No where
+  lcontramap f (No g) = No (f %. g)
 
 instance Contravariant No where
   contramap f (No g) = No (g . f)
@@ -177,25 +192,25 @@ instance Prop (Ur a) where
   Ur a != No f = f a
 
 instance Prop (No a) where
-  type Not (No a) = Ur a 
+  type Not (No a) = Ur a
   No f != Ur a = f a
 
 {-
 funPar :: forall a b. Prop a => (a %1 -> b) %1 -> a ⊸ b
-funPar = Unsafe.toLinear go where
-  go :: (a %1 -> b) -> Not a ⅋ b
-  go f = Par $ With \case 
+funPar = go where
+  go :: (a %1 -> b) %1 -> Not a ⅋ b
+  go f = par \case
     R -> f
-    L -> _ -- impossible as expected
+    L -> _ f -- impossible as expected
 -}
 
 weakening :: forall p q. Prop p => p ⊸ (Ur q ⊸ p)
 weakening = par \case
   L -> \(Ur{}, np) -> np
-  R -> \p -> par \case 
+  R -> \p -> par \case
     L -> \q -> p != q
     R -> \Ur{} -> p
- 
+
 bangDist :: forall p q. Prop p => Ur (p ⊸ q) ⊸ (Ur p ⊸ Ur q)
 bangDist = par \case
   L -> \(Ur yp, No cq) -> No \f -> cq $ parR f yp
@@ -209,16 +224,16 @@ extractBang = par \case
   R -> \(Ur p) -> p
 
 duplicateBang :: forall p. Ur p ⊸ Ur (Ur p)
-duplicateBang = unsafePar \case
-  L -> \x -> contramap Ur x
-  R -> Ur
+duplicateBang = par \case
+  L -> \x -> lcontramap Ur x
+  R -> \(Ur x) -> Ur (Ur x)
 
 contraction :: (Prop p, Prop q) => (Ur p ⊸ Ur p ⊸ q) ⊸ Ur p ⊸ q
-contraction = unsafePar \case
-  L -> \ab@(a, _) -> (a, ab)
-  R -> \x -> unsafePar \case
+contraction = par \case
+  L -> \(Ur a, b) -> (Ur a, (Ur a, b))
+  R -> \x -> par \case
     L -> \y -> No \f -> parL (parR x (Ur f)) != Nofun y (Ur f)
-    R -> \urp -> parR (parR x urp) urp
+    R -> \(Ur p) -> parR (parR x (Ur p)) (Ur p)
 
 -- ? modality
 newtype WhyNot a = WhyNot (forall r. Not a %1 -> r)
@@ -234,7 +249,7 @@ why (Why x) = x
 instance Prop a => Prop (WhyNot a) where
   type Not (WhyNot a) = Why a
   WhyNot f != Why x = f x
-  
+
 instance Prop a => Prop (Why a) where
   type Not (Why a) = WhyNot a
   Why x != WhyNot f = f x
@@ -260,7 +275,7 @@ instance Prop x => Functor ((*) x) where
     R -> \(x, a) -> (x, fun f a)
 
 -- prop data bifunctor
-class 
+class
   ( forall a. Prop a => Functor (t a)
   ) => Bifunctor t where
   bimap
@@ -277,7 +292,7 @@ class (Prop (I t), Bifunctor t) => Monoidal t where
   unlambda :: Prop a => t (I t) a %1 -> a
   rho :: Prop a => a %1 -> t a (I t)
   unrho :: Prop a => t a (I t) %1 -> a
-  
+
 class Monoidal t => SymmetricMonoidal t where
   swap :: (Prop a, Prop b) => t a b %1 -> t b a
 
@@ -324,7 +339,7 @@ instance SymmetricMonoidal Either where
     Right a -> Left a
 
 instance Bifunctor (,) where
-  bimap f g = par \case 
+  bimap f g = par \case
     L -> \nbpnd -> par \case
       L -> \c -> unfun f (parL nbpnd (fun g c))
       R -> \a -> unfun g (parR nbpnd (fun f a))
@@ -336,7 +351,7 @@ instance Monoidal (,) where
   unassoc (a,(b,c)) = ((a,b),c)
   lambda = ((),)
   unlambda ((),a) = a
-  rho = (,()) 
+  rho = (,())
   unrho (a,()) = a
 
 instance SymmetricMonoidal (,) where
@@ -377,7 +392,7 @@ instance Monoidal (&) where
     R -> a
   unlambda = withR
   rho b = with \case
-    L -> b 
+    L -> b
     R -> Top b
   unrho = withL
 
@@ -427,7 +442,7 @@ instance SymmetricMonoidal (⅋) where
     R -> \nb -> parL apb nb
 
 {-
-ax1 :: Prop p => p ⊸ p 
+ax1 :: Prop p => p ⊸ p
 ax1 = unsafePar \case
   L -> \x -> x
   R -> \x -> x
@@ -457,9 +472,9 @@ mp_rule_ctx :: P (γ ⅋ p) -> P (p ⊸ q) -> P (γ ⅋ q)
 mp_rule_ctx gp pq = (fst gp . fst pq, snd pq . snd gp)
 
 deduction :: P ((γ ⅋ p) ⊢ q) -> P (γ ⊢ (p ⊸ q))
-deduction gpq = 
+deduction gpq =
   ( \(_,nq) -> fst $ fst gpq nq
-  , \pg ->  
+  , \pg ->
     ( \rq -> snd $ fst gpq rq
     , \pp -> snd gpq (const pg,const pp)
     )
