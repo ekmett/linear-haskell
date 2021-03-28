@@ -1,0 +1,19 @@
+cabal-version: 2.2
+name:          logic
+version:       0
+build-type:    Simple
+
+library
+  default-language: Haskell2010
+  build-depends:
+    base,
+    comonad,
+    contravariant,
+    ghc-prim,
+    linear-base
+  exposed-modules: Linear
+  ghc-options: -Wall -fno-show-valid-hole-fits
+
+--executable logic
+--  build-depends: base, logic
+--  main-is: Main.hs

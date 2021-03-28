@@ -29,19 +29,19 @@ module Linear.Range
   
   ) where
 
-import Data.Vector as Vector
-import Data.V.Linear
-import Data.V.Linear.Internal.V (V(..))
+import Data.Kind
 import Data.Type.Equality
 import Data.Unrestricted.Linear
-import GHC.TypeNats
+import Data.V.Linear
+import Data.V.Linear.Internal.V (V(..))
+import Data.Vector as Vector
 import GHC.Exts (magicDict, Any, Proxy#, proxy#)
-import Data.Kind
-import Prelude qualified as P
-import Prelude (Int,($))
-import Unsafe.Linear as Unsafe
-import Unsafe.Coerce as UnsafeNL
+import GHC.TypeNats
 import Numeric.Natural
+import Prelude (Int,($))
+import Prelude qualified as P
+import Unsafe.Coerce as UnsafeNL
+import Unsafe.Linear as Unsafe
 
 -- TODO
 -- We can't really use V for this. We want a mutable vector for the backend.

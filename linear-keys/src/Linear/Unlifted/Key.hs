@@ -30,7 +30,7 @@ newtype Ref# s = Ref# (GHC.MutVar# s GHC.Any)
 
 -- keys allow you to swap the contents of the refs, 0 bytes wide
 type role Key# nominal representational
-newtype Key# s a = Key# (GHC.State# s) 
+newtype Key# s a = Key# (GHC.State# s)
 
 newtype Poly a b = Poly (forall s. Ref# s -> Key# s a %1 -> Ur b)
 
@@ -51,7 +51,7 @@ freeze (Ref# p) = Unsafe.toLinear go where
 unique :: HasCallStack => Key# s a %1 -> Key# s b %1 -> r
 unique = error "Unlifted.Key.dedup: duplicate key"
 
-turn :: forall s a b. Ref# s -> Key# s a %1 -> (# a, b %1 -> Key# s b #)
+urn :: forall s a b. Ref# s -> Key# s a %1 -> (# a, b %1 -> Key# s b #)
 turn (Ref# p) = Unsafe.toLinear go where
   go :: Key# s a -> (# a, b %1 -> Key# s b #)
   go (Key# s) = case GHC.readMutVar# p s of
